@@ -7,42 +7,70 @@ d3.json(queryUrl).then(function (data) {
     createFeatures(data.features);
 });
 
-// function markerSize(magnitude) {
-//     return Math.sqrt(magnitude) * 50;
+function markerSize(mag) {
+    // return Math.sqrt(mag) * 500;
+    return mag * mag * 5000;
+  
 
-// }
+}
+
 
 // function markerColor(depth) {
-//     return Math.floor(Math.random()*) * 50;
+//     if (depth < 10) {
+//         return 'lime'
+//     } else if (depth <= 30) {
+//         return 'greenyellow'
+//     } else if (depth <= 50) {
+//         return 'yellow'
+//     } else if (depth <= 70) {
+//         return 'gold'
+//     } else if (depth <= 90) {
+//         return 'orange'
+//     } else return 'red'
+// };
 
-// }
-
-// Loop through the data, and create one marker for each earthquake point.
-// for (var i = 0; i < features.length; i++) {
-//     L.circle(features[i].geometry.coordinates, {
-//         fillOpacity: 0.75,
-//         color: "white",
-//         fillColor: "purple",
-//         // Setting our circle's radius to equal the output of our markerSize() function:
-//         // This will make our marker's size proportionate to its earthquake magnitude.
-//         radius: markerSize(features[i].properties.mag)
-//     }).bindPopup(`<h1>${features[i].properties.place}</h1> <hr> <h3>Time: ${features[i].properties.time.toLocaleString()}</h3>`).addTo(myMap);
-// }
+function markerColor(depth) {
+    if (depth >= 90) {
+        return 'red'
+    } else if (depth >= 70) {
+        return 'orange'
+    } else if (depth >= 50) {
+        return 'gold'
+    } else if (depth >= 30) {
+        return 'yellow'
+    } else if (depth >= 10) {
+        return 'greenyellow'
+    } else return 'lime'
+};
 
 
 function createFeatures(earthquakeData) {
 
 // Define a function that we want to run once for each feature in the features array.
 // Give each feature a popup that describes the place and time of the earthquake.
-function onEachFeature(feature, layer) {
-    layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
+function onEachFeature(features, layer) {
+    // layer.bindPopup(`<h3>${features.properties.place}</h3><hr><p>${new Date(features.properties.time)}</p>`);
+    layer.bindPopup(`<h3>Location: ${features.properties.place}</h3><hr><p>Date and Time: ${new Date(features.properties.time)}</p><hr><p>Earthquake Magnitude:${features.properties.mag}</p><p>Depth:${features.geometry.coordinates[2]}</p>`);
+    // <hr><p>${new Depth(fatures.geometry.coordinates[2])}</p>
 }
+
+function pointToLayer(features, latlng) {
+    return L.circle(latlng, 
+        {radius: markerSize(features.properties.mag),
+        color: markerColor(features.geometry.coordinates[2]),
+        fillcolor: markerColor(features.geometry.coordinates[2])})
+        
+}
+
 
 // Create a GeoJSON layer that contains the features array on the earthquakeData object.
 // Run the onEachFeature function once for each piece of data in the array.
 var earthquakes = L.geoJSON(earthquakeData, {
-    onEachFeature: onEachFeature
+    onEachFeature: onEachFeature,
+    pointToLayer: pointToLayer
+    
 });
+
 
 // Send our earthquakes layer to the createMap function/
 createMap(earthquakes);
@@ -88,35 +116,35 @@ function createMap(earthquakes) {
 
 }
 
+// // Set up the legend.
+// var legend = L.control({ position: "bottomright" });
+// legend.onAdd = function () {
+//     var div = L.DomUtil.create("div", "info legend");
+//     var limits = geojson.options.limits;
+//     var colors = geojson.options.colors;
+//     var labels = [];
 
+//     // Add the minimum and maximum.
+//     var legendInfo = "<h1>Population with Children<br />(ages 6-17)</h1>" +
+//         "<div class=\"labels\">" +
+//         "<div class=\"min\">" + limits[0] + "</div>" +
+//         "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
+//         "</div>";
 
+//     div.innerHTML = legendInfo;
 
-// function createMap(earthquakeLocations) {
-
-// // Create the tile layer that will be the background of our map.
-//     var streetmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-// });
-
-// // Create a baseMaps object to hold the streetmap layer.
-//     var baseMaps = {
-//         "Street Map": streetmap
-//     };
-
-//     // Create an overlayMaps object to hold the bikeStations layer.
-//     var overlayMaps = {
-//         "Bike Stations": earthquakeLocations
-//     };
-
-//     // Create the map object with options.
-//     var map = L.map("map-id", {
-//         center: [35.9068333, -117.7348333],
-//         zoom: 12,
-//         layers: [streetmap, earthquakeLocations]
+//     limits.forEach(function (limit, index) {
+//         labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
 //     });
 
-//     // Create a layer control, and pass it baseMaps and overlayMaps. Add the layer control to the map.
-//     L.control.layers(baseMaps, overlayMaps, {
-//         collapsed: false
-//     }).addTo(map);
-// }
+//     div.innerHTML += "<ul>" + labels.join("") + "</ul>";
+//     return div;
+// };
+
+// // Adding the legend to the map
+// legend.addTo(myMap);
+
+// };
+
+
+
